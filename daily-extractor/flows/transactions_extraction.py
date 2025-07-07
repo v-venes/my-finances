@@ -1,15 +1,27 @@
+from datetime import datetime
+from typing import TypedDict
 from prefect import flow, task
 from prefect.logging import get_run_logger
-from datetime import datetime
+
+from flows.services.organizze_service import GetTransactionsParams, OrganizzeService
+
+class TransactionsExtractionParams(TypedDict):
+    organizze_service: OrganizzeService
 
 class TransactionsExtraction:
-    # Passar o client http
+    
+
+    def __init__(self, params: TransactionsExtractionParams) -> None:
+        self.__organizze_service = params.get("organizze_service")
     # Passar repository
 
     @task
     def get_transactions_from_range(self, from_date: datetime, to_date: datetime):
-        print(from_date)
-        print(to_date)
+        logger = get_run_logger()
+
+        transactions = self.__organizze_service.get_transactions(GetTransactionsParams(from_date=from_date, to_date=to_date))
+        logger.info(f"{len(transactions)} transactions founded!")
+        print(transactions)
         return []
 
     @task

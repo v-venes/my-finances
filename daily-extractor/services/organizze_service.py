@@ -3,6 +3,9 @@ import requests
 from typing import TypedDict
 from requests.auth import HTTPBasicAuth
 
+from models.category import Category
+from models.transaction import Transaction
+
 
 class OrganizzeServiceParams(TypedDict):
     base_url: str
@@ -24,7 +27,7 @@ class OrganizzeService:
         )
         self.__headers = {"user_agent": params.get("user_agent")}
 
-    def get_transactions(self, params: GetTransactionsParams):
+    def get_transactions(self, params: GetTransactionsParams) -> list[Transaction]:
         start_date = params.get("from_date").strftime("%Y-%m-%d")
         end_date = params.get("to_date").strftime("%Y-%m-%d")
 
@@ -35,12 +38,14 @@ class OrganizzeService:
             auth=self.__auth,
             headers=self.__headers,
         )
+
         return response.json()
 
-    def get_category(self, category_id: str):
+    def get_category(self, category_id: str) -> Category:
         response = requests.get(
-            f"{self.__base_url}/transactions/{category_id}",
+            f"{self.__base_url}/categories/{category_id}",
             auth=self.__auth,
             headers=self.__headers,
         )
-        return response
+
+        return response.json()

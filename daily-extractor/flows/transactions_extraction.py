@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 from typing import TypedDict
 from prefect import flow, task
+from prefect.cache_policies import NO_CACHE
 from prefect.logging import get_run_logger
 
 from models.category import Category
@@ -25,7 +26,7 @@ class TransactionsExtraction:
         self.__organizze_service = params.get("organizze_service")
         self.__transactions_repository = params.get("transactions_repository")
 
-    @task
+    @task(cache_policy=NO_CACHE)
     def get_transactions_from_range(self, from_date: datetime, to_date: datetime):
         logger = get_run_logger()
 
@@ -36,7 +37,7 @@ class TransactionsExtraction:
 
         return transactions
 
-    @task
+    @task(cache_policy=NO_CACHE)
     def get_transactions_categories(
         self, transactions: list[Transaction]
     ) -> dict[str, Category]:
@@ -52,7 +53,7 @@ class TransactionsExtraction:
 
         return categories
 
-    @task
+    @task(cache_policy=NO_CACHE)
     def format_transactions(
         self, transactions: list[Transaction], categories: dict[str, Category]
     ):
@@ -61,7 +62,7 @@ class TransactionsExtraction:
             for transaction in transactions
         ]
 
-    @task
+    @task(cache_policy=NO_CACHE)
     def store_transactions(self, transactions):
         logger = get_run_logger()
 
